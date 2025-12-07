@@ -1,6 +1,6 @@
 {
   "name": "android_util_mcp_server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server that converts SVG into Android VectorDrawable XML with a fast path and caching.",
   "main": "src/index.js",
   "scripts": {

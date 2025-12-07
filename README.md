@@ -17,13 +17,21 @@ Small MCP server that turns SVG markup/files into Android VectorDrawable XML. Bu
 ![Flag conversion preview](assets/figma/flag-uk-preview.png)
 ![Batch flag review](assets/figma/flag-batch-review.png)
 ![Batch run via MCP](assets/figma/flag-batch-runs.png)
+![Crash logcat prompt](assets/figma/my%20app%20just.png)
+![Response gap prompt](assets/figma/Isease%20gap.png)
 
-## Current tool
-`convert-svg-to-android-drawable`
-- Inputs: `svg` (inline) **or** `svgPath` (file path). Optional: `outputPath`, `floatPrecision` (default 2), `fillBlack` (default false), `xmlTag` (default false), `tint`, `cache` (default true).
-- Output: VectorDrawable XML text; also writes to disk when `outputPath` is provided.
-- Performance: LRU cache (32 entries) keyed by SVG + options plus fast reuse in-session.
-- Converter: vendored fork in `vendor/svg2vectordrawable` with fixes for `rgb()/rgba()`, `hsl()/hsla()`, and named colors. Upstream license: `vendor/svg2vectordrawable/LICENSE` (MIT).
+## Current tools
+- `convert-svg-to-android-drawable`
+  - Inputs: `svg` (inline) **or** `svgPath` (file path). Optional: `outputPath`, `floatPrecision` (default 2), `fillBlack` (default false), `xmlTag` (default false), `tint`, `cache` (default true).
+  - Output: VectorDrawable XML text; also writes to disk when `outputPath` is provided.
+  - Performance: LRU cache (32 entries) keyed by SVG + options plus fast reuse in-session.
+  - Converter: vendored fork in `vendor/svg2vectordrawable` with fixes for `rgb()/rgba()`, `hsl()/hsla()`, and named colors. Upstream license: `vendor/svg2vectordrawable/LICENSE` (MIT).
+
+- `read-adb-logcat`
+  - Inputs: `packageName` (resolve pid via `adb shell pidof -s`), `pid` (explicit), `tag`, `priority` (`V|D|I|W|E|F|S`, default `V`), `maxLines` (tail count, default `200`, max `2000`), `timeoutMs` (default `5000`, max `15000`).
+  - Behavior: Runs `adb logcat -d -t <maxLines>` with optional `--pid=<pid>` and `-s tag:priority`.
+  - Output: Returns the logcat text; if no lines are returned, responds with a short message.
+  - Notes: Requires `adb` available in PATH and a connected device/emulator. Provide at least one of `packageName`, `pid`, or `tag` to scope logs.
 
 ## Roadmap (planned)
 - Additional MCP tools for Android assets (e.g., batch conversions, validations, optimizers).
