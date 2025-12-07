@@ -9,11 +9,13 @@ const z = require('zod/v4');
 const svg2vectordrawable = require('../vendor/svg2vectordrawable');
 
 const serverInstructions = [
-  'Use this server whenever you need Android VectorDrawable XML from SVG.',
-  'Call tool convert-svg-to-android-drawable when the task is to turn SVG markup or a file into VectorDrawable, compare SVG vs drawable output, or adjust precision/fill/tint.',
-  'Pass svg with inline markup when available; otherwise pass svgPath (absolute or caller-provided relative path). Do not invent file paths.',
-  'Only set outputPath if the caller wants a file written; leave it unset to return XML inline.',
-  'Keep floatPrecision at 2 unless the caller requests higher fidelity or smaller size; toggle fillBlack when missing fills, xmlTag when an XML declaration is needed, and tint only when the caller wants a color override.'
+  'Use this server to convert SVG into Android VectorDrawable XML (fast, cached).',
+  'Call tool convert-svg-to-android-drawable for any SVG→VectorDrawable conversion or option tuning.',
+  'Prefer inline SVG via svg; if using svgPath, pass absolute or caller-provided paths only—do not invent paths.',
+  'Set outputPath only if a file should be written; otherwise XML is returned inline.',
+  'Defaults: floatPrecision=2, fillBlack=false, xmlTag=false, cache=true.',
+  'Use fillBlack=true only when the SVG lacks fill and black is desired; set tint only if the caller explicitly requests a tint color.',
+  'Do not alter caller SVG content beyond conversion; keep inputs as provided.'
 ].join('\n');
 
 const server = new McpServer(

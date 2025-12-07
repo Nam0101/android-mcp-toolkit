@@ -1,4 +1,4 @@
-# Android SVG → Drawable MCP Server
+# Android MCP Toolkit for AI Agents
 
 Small MCP server that turns SVG markup/files into Android VectorDrawable XML. Built to be dropped into MCP-friendly clients and to grow with more Android utility tools over time.
 
@@ -16,7 +16,7 @@ Small MCP server that turns SVG markup/files into Android VectorDrawable XML. Bu
 ![Figma request via MCP](assets/figma/figma-request.png)
 ![Flag conversion preview](assets/figma/flag-uk-preview.png)
 ![Batch flag review](assets/figma/flag-batch-review.png)
-![Vector XML view](assets/figma/flag-uk-code.png)
+![Batch run via MCP](assets/figma/flag-batch-runs.png)
 
 ## Current tool
 `convert-svg-to-android-drawable`
@@ -28,6 +28,11 @@ Small MCP server that turns SVG markup/files into Android VectorDrawable XML. Bu
 ## Roadmap (planned)
 - Additional MCP tools for Android assets (e.g., batch conversions, validations, optimizers).
 - Optional resource prompts for common Android drawables/templates.
+- Upcoming MCP utilities (planned):
+  - Logcat reader: stream and filter Android logcat output via MCP.
+  - Asset checkers: flag common drawable issues (size, alpha, color profile).
+  - Batch conversions: multi-SVG to VectorDrawable with consistent options.
+  - Template prompts: quick-start drawable/XML snippets for common patterns.
 
 ## Quick start
 - `npm install`
