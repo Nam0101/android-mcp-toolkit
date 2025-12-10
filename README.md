@@ -1,8 +1,9 @@
 # Android MCP Toolkit for AI Agents
 
-Small MCP server with two tools:
+MCP server with tools for Android development and internationalization:
 - Fast SVG → Android VectorDrawable conversion (cached, file or inline).
 - adb logcat reader with package/pid/tag filters for quick crash triage.
+- Semantic translation with character length preservation for i18n.
 
 ## Why this exists
 **The Mission: Bringing Native Android to the AI Agent Era**
@@ -15,11 +16,14 @@ While the AI ecosystem flourishes with web-first tools, Android development ofte
 
 🤖 Agent-Native Architecture: Deliver structured, scriptable outputs that LLMs can parse and act upon efficiently.
 
+🌐 Internationalization Support: Translate strings with character length awareness for UI consistency across languages.
+
 🚀 Built for Extensibility: A solid foundation designed to grow, paving the way for future utilities like bitmap helpers and asset validation.
 
 ## Pairing ideas
 - **Figma MCP**: grab SVGs from designs, feed to `convert-svg-to-android-drawable` to get XML for Android resources.
 - **Debugging**: while running the app, call `read-adb-logcat` with package name or tag to capture crashes and filtered logs without leaving the MCP client.
+- **Localization**: use `semantic-translate` to generate translations for strings.xml while maintaining similar character counts for consistent UI layouts.
 
 ### Previews
 **SVG to VectorDrawable**
@@ -71,6 +75,13 @@ While the AI ecosystem flourishes with web-first tools, Android development ofte
 - `clear-logcat-buffer`
   - Inputs: `timeoutMs` (default `5000`, max `15000`).
   - Behavior: Runs `adb logcat -c` to clear buffers before a new scenario.
+
+- `semantic-translate`
+  - Inputs: `text` (required), `target_language` (required, e.g., `vi`, `zh-CN`, `ja`, `ko`, `es`, `fr`, `de`), `source_language` (default `auto`), `max_length_variance` (percentage, default `20`).
+  - Behavior: Translates text between languages while attempting to preserve character length similar to the original. Returns translated text with character count comparison and length variance metrics.
+  - Output: Translated text, character counts (original vs translated), variance percentage, and compliance status.
+  - Use cases: Localization of Android strings.xml, UI text translation with layout constraints, internationalization testing.
+  - Notes: Character length variance is informational; some language pairs (e.g., English to Chinese/Japanese) naturally have different character densities. Adjust `max_length_variance` as needed for your use case.
 
 ## Roadmap (planned)
 - Additional MCP tools for Android assets (e.g., batch conversions, validations, optimizers).
