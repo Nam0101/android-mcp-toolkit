@@ -25,6 +25,7 @@
   "type": "commonjs",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",
+    "@vitalets/google-translate-api": "^9.2.1",
     "svg-path-bounds": "^1.0.1",
     "svgo": "^2.8.0",
     "svgpath": "^2.5.0",
