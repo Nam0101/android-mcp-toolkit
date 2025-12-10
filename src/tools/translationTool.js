@@ -2,7 +2,7 @@ const { translate } = require('@vitalets/google-translate-api');
 const z = require('zod/v4');
 
 const translationToolInstructions = [
-  'Use semantic-translate to translate text between languages while preserving character length similar to English.',
+  'Use semantic-translate to translate text between languages while preserving character length similar to the original text.',
   'Supports multiple languages: Vietnamese (vi), Chinese (zh-CN/zh-TW), Japanese (ja), Korean (ko), Spanish (es), French (fr), German (de), and more.',
   'By default maintains character length within ±20% of original, adjustable via max_length_variance parameter.',
   'Returns translated text with character count comparison and length compliance status.',
@@ -91,7 +91,7 @@ function registerTranslationTool(server) {
     {
       title: 'Semantic Translation',
       description:
-        'Translate text between languages while attempting to preserve character length similar to English (±20% default tolerance). Supports multiple languages including Vietnamese, Chinese, Japanese, Korean, Spanish, French, German, and more.',
+        'Translate text between languages while attempting to preserve character length similar to the original text (±20% default tolerance). Supports multiple languages including Vietnamese, Chinese, Japanese, Korean, Spanish, French, German, and more.',
       inputSchema: semanticTranslateInputSchema
     },
     async (params, extra) => {
