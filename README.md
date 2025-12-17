@@ -1,9 +1,10 @@
 # Android MCP Toolkit for AI Agents
 
-Small MCP server with three tools:
+MCP server with tools for Android development:
 - Fast SVG → Android VectorDrawable conversion (cached, file or inline).
 - adb logcat reader with package/pid/tag filters for quick crash triage.
 - Translation length difference estimator to flag risky length deltas before layout breaks.
+- Device information tools: get device info, list connected devices, installed packages, and take screenshots.
 
 ## Why this exists
 **The Mission: Bringing Native Android to the AI Agent Era**
@@ -76,6 +77,26 @@ While the AI ecosystem flourishes with web-first tools, Android development ofte
 - `estimate-text-length-difference`
   - Inputs: `sourceText` (original), `translatedText` (to compare), `tolerancePercent` (default `30`, max `500`).
   - Behavior: Measures grapheme length of both strings, computes percent change, and reports whether it exceeds the tolerance (useful to catch translation length blowups that could break layouts).
+
+- `get-device-info`
+  - Inputs: `timeoutMs` (default `5000`, max `15000`).
+  - Behavior: Retrieves comprehensive device information including model, manufacturer, Android version, API level, screen resolution, memory, and battery status.
+  - Notes: Useful for understanding device context before debugging or providing device-specific recommendations.
+
+- `list-connected-devices`
+  - Inputs: `timeoutMs` (default `5000`, max `15000`).
+  - Behavior: Lists all connected Android devices and emulators with serial numbers and connection states.
+  - Notes: Useful for multi-device setups to identify which devices are available.
+
+- `get-installed-packages`
+  - Inputs: `filter` (optional keyword), `systemOnly` (default false), `thirdPartyOnly` (default false), `timeoutMs` (default `5000`, max `15000`).
+  - Behavior: Lists installed packages on the device. Can filter by keyword or show only system/third-party apps.
+  - Notes: Useful for verifying app installation or finding package names for other tools.
+
+- `take-screenshot`
+  - Inputs: `outputPath` (required local path), `timeoutMs` (default `10000`, max `30000`).
+  - Behavior: Captures a screenshot from the connected device and saves it to the specified local path.
+  - Notes: Useful for documenting UI states or capturing visual bugs.
 
 ## Roadmap (planned)
 - Additional MCP tools for Android assets (e.g., batch conversions, validations, optimizers).

@@ -4,8 +4,9 @@ const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio
 const { registerSvgTool, svgToolInstructions } = require('./tools/svgTool');
 const { registerLogcatTool, logcatToolInstructions } = require('./tools/logcatTool');
 const { registerTextLengthTool, textLengthToolInstructions } = require('./tools/textLengthTool');
+const { registerDeviceTool, deviceToolInstructions } = require('./tools/deviceTool');
 
-const serverInstructions = [svgToolInstructions, logcatToolInstructions, textLengthToolInstructions].join('\n');
+const serverInstructions = [svgToolInstructions, logcatToolInstructions, textLengthToolInstructions, deviceToolInstructions].join('\n');
 
 const server = new McpServer(
   {
@@ -21,6 +22,7 @@ const server = new McpServer(
 registerSvgTool(server);
 registerLogcatTool(server);
 registerTextLengthTool(server);
+registerDeviceTool(server);
 
 async function main() {
   const transport = new StdioServerTransport();
