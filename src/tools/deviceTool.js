@@ -1,5 +1,6 @@
 const path = require('node:path');
 const fs = require('node:fs/promises');
+const { randomUUID } = require('node:crypto');
 const z = require('zod/v4');
 const { runAdbCommand } = require('../utils/adb');
 
@@ -20,8 +21,29 @@ const BATTERY_STATUS_LABELS = {
   [BATTERY_STATUS.FULL]: 'Full'
 };
 
-// Device path for temporary screenshot storage
-const DEVICE_SCREENSHOT_PATH = '/sdcard/mcp_screenshot.png';
+// Device path prefix for temporary screenshot storage (random UUID appended at runtime)
+const DEVICE_SCREENSHOT_PREFIX = '/sdcard/mcp_screenshot_';
+
+/**
+ * Generate a unique temporary screenshot path on the device.
+ * @returns {string} Unique device path for screenshot
+ */
+function generateDeviceScreenshotPath() {
+  return `${DEVICE_SCREENSHOT_PREFIX}${randomUUID()}.png`;
+}
+
+/**
+ * Get battery status label from status code.
+ * @param {string} statusCode - Status code string from adb
+ * @returns {string} Human-readable battery status
+ */
+function getBatteryStatusLabel(statusCode) {
+  const code = parseInt(statusCode, 10);
+  if (Number.isNaN(code) || code < BATTERY_STATUS.UNKNOWN || code > BATTERY_STATUS.FULL) {
+    return 'Unknown';
+  }
+  return BATTERY_STATUS_LABELS[code] || 'Unknown';
+}
 
 const deviceToolInstructions = [
   'Use get-device-info to retrieve comprehensive Android device/emulator information (model, API level, screen density, etc.).',
@@ -169,7 +191,7 @@ function registerDeviceTool(server) {
         const levelMatch = batteryInfo.match(/level:\s*(\d+)/);
         const statusMatch = batteryInfo.match(/status:\s*(\d+)/);
         if (levelMatch) {
-          const status = statusMatch ? BATTERY_STATUS_LABELS[parseInt(statusMatch[1], 10)] || 'Unknown' : '';
+          const status = statusMatch ? getBatteryStatusLabel(statusMatch[1]) : '';
           results.push(`Battery: ${levelMatch[1]}%${status ? ` (${status})` : ''}`);
         }
       } catch {
@@ -260,24 +282,35 @@ function registerDeviceTool(server) {
       inputSchema: screenshotInputSchema
     },
     async params => {
+      // Basic path validation - ensure it ends with .png and doesn't contain path traversal
+      const resolvedPath = path.resolve(params.outputPath);
+      if (!resolvedPath.endsWith('.png')) {
+        throw new Error('Output path must end with .png extension');
+      }
+      if (params.outputPath.includes('..')) {
+        throw new Error('Output path cannot contain path traversal (..)');
+      }
+
+      // Generate unique device path to avoid conflicts with other apps
+      const devicePath = generateDeviceScreenshotPath();
+
       // Capture screenshot on device
-      await runAdbCommand(['shell', 'screencap', '-p', DEVICE_SCREENSHOT_PATH], params.timeoutMs);
+      await runAdbCommand(['shell', 'screencap', '-p', devicePath], params.timeoutMs);
 
       // Ensure output directory exists
-      const outputDir = path.dirname(path.resolve(params.outputPath));
+      const outputDir = path.dirname(resolvedPath);
       await fs.mkdir(outputDir, { recursive: true });
 
       // Pull screenshot to local path
-      await runAdbCommand(['pull', DEVICE_SCREENSHOT_PATH, params.outputPath], params.timeoutMs);
+      await runAdbCommand(['pull', devicePath, params.outputPath], params.timeoutMs);
 
       // Clean up device file
       try {
-        await runAdbCommand(['shell', 'rm', DEVICE_SCREENSHOT_PATH], params.timeoutMs);
+        await runAdbCommand(['shell', 'rm', devicePath], params.timeoutMs);
       } catch {
         // Ignore cleanup errors
       }
 
-      const resolvedPath = path.resolve(params.outputPath);
       return { content: [{ type: 'text', text: `Screenshot saved to: ${resolvedPath}` }] };
     }
   );
