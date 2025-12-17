@@ -1,10 +1,7 @@
-const { execFile } = require('node:child_process');
-const { promisify } = require('node:util');
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const z = require('zod/v4');
-
-const execFileAsync = promisify(execFile);
+const { runAdbCommand } = require('../utils/adb');
 
 // Android battery status constants from BatteryManager
 const BATTERY_STATUS = {
@@ -91,23 +88,6 @@ const screenshotInputSchema = z.object({
     .default(10000)
     .describe('Timeout per adb call in milliseconds')
 });
-
-async function runAdbCommand(args, timeoutMs) {
-  try {
-    const { stdout } = await execFileAsync('adb', args, {
-      timeout: timeoutMs,
-      maxBuffer: 5 * 1024 * 1024
-    });
-    return stdout.trimEnd();
-  } catch (error) {
-    const stderr = error && typeof error.stderr === 'string' ? error.stderr.trim() : '';
-    const message = [`adb ${args.join(' ')} failed`, error.message].filter(Boolean).join(': ');
-    if (stderr) {
-      throw new Error(`${message} | stderr: ${stderr}`);
-    }
-    throw new Error(message);
-  }
-}
 
 async function getDeviceProperty(prop, timeoutMs) {
   try {

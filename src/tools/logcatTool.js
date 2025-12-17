@@ -1,8 +1,5 @@
-const { execFile } = require('node:child_process');
-const { promisify } = require('node:util');
 const z = require('zod/v4');
-
-const execFileAsync = promisify(execFile);
+const { runAdbCommand } = require('../utils/adb');
 
 const logcatToolInstructions = [
   'Use read-adb-logcat to tail device logs for a package, pid, or tag; default tail=200 lines.',
@@ -114,23 +111,6 @@ const clearLogcatInputSchema = z.object({
     .default(5000)
     .describe('Timeout per adb call in milliseconds')
 });
-
-async function runAdbCommand(args, timeoutMs) {
-  try {
-    const { stdout } = await execFileAsync('adb', args, {
-      timeout: timeoutMs,
-      maxBuffer: 5 * 1024 * 1024
-    });
-    return stdout.trimEnd();
-  } catch (error) {
-    const stderr = error && typeof error.stderr === 'string' ? error.stderr.trim() : '';
-    const message = [`adb ${args.join(' ')} failed`, error.message].filter(Boolean).join(': ');
-    if (stderr) {
-      throw new Error(`${message} | stderr: ${stderr}`);
-    }
-    throw new Error(message);
-  }
-}
 
 async function resolvePid(packageName, timeoutMs) {
   const output = await runAdbCommand(['shell', 'pidof', '-s', packageName], timeoutMs);
