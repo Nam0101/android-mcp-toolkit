@@ -6,6 +6,23 @@ const z = require('zod/v4');
 
 const execFileAsync = promisify(execFile);
 
+// Android battery status constants from BatteryManager
+const BATTERY_STATUS = {
+  UNKNOWN: 1,
+  CHARGING: 2,
+  DISCHARGING: 3,
+  NOT_CHARGING: 4,
+  FULL: 5
+};
+
+const BATTERY_STATUS_LABELS = {
+  [BATTERY_STATUS.UNKNOWN]: 'Unknown',
+  [BATTERY_STATUS.CHARGING]: 'Charging',
+  [BATTERY_STATUS.DISCHARGING]: 'Discharging',
+  [BATTERY_STATUS.NOT_CHARGING]: 'Not charging',
+  [BATTERY_STATUS.FULL]: 'Full'
+};
+
 const deviceToolInstructions = [
   'Use get-device-info to retrieve comprehensive Android device/emulator information (model, API level, screen density, etc.).',
   'Use list-connected-devices to see all connected devices/emulators with their serial numbers and states.',
@@ -169,8 +186,7 @@ function registerDeviceTool(server) {
         const levelMatch = batteryInfo.match(/level:\s*(\d+)/);
         const statusMatch = batteryInfo.match(/status:\s*(\d+)/);
         if (levelMatch) {
-          const statusMap = { 1: 'Unknown', 2: 'Charging', 3: 'Discharging', 4: 'Not charging', 5: 'Full' };
-          const status = statusMatch ? statusMap[statusMatch[1]] || 'Unknown' : '';
+          const status = statusMatch ? BATTERY_STATUS_LABELS[statusMatch[1]] || 'Unknown' : '';
           results.push(`Battery: ${levelMatch[1]}%${status ? ` (${status})` : ''}`);
         }
       } catch {
