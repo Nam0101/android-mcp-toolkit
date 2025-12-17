@@ -23,6 +23,9 @@ const BATTERY_STATUS_LABELS = {
   [BATTERY_STATUS.FULL]: 'Full'
 };
 
+// Device path for temporary screenshot storage
+const DEVICE_SCREENSHOT_PATH = '/sdcard/mcp_screenshot.png';
+
 const deviceToolInstructions = [
   'Use get-device-info to retrieve comprehensive Android device/emulator information (model, API level, screen density, etc.).',
   'Use list-connected-devices to see all connected devices/emulators with their serial numbers and states.',
@@ -186,7 +189,7 @@ function registerDeviceTool(server) {
         const levelMatch = batteryInfo.match(/level:\s*(\d+)/);
         const statusMatch = batteryInfo.match(/status:\s*(\d+)/);
         if (levelMatch) {
-          const status = statusMatch ? BATTERY_STATUS_LABELS[statusMatch[1]] || 'Unknown' : '';
+          const status = statusMatch ? BATTERY_STATUS_LABELS[parseInt(statusMatch[1], 10)] || 'Unknown' : '';
           results.push(`Battery: ${levelMatch[1]}%${status ? ` (${status})` : ''}`);
         }
       } catch {
@@ -275,21 +278,19 @@ function registerDeviceTool(server) {
       inputSchema: screenshotInputSchema
     },
     async params => {
-      const devicePath = '/sdcard/mcp_screenshot.png';
-
       // Capture screenshot on device
-      await runAdbCommand(['shell', 'screencap', '-p', devicePath], params.timeoutMs);
+      await runAdbCommand(['shell', 'screencap', '-p', DEVICE_SCREENSHOT_PATH], params.timeoutMs);
 
       // Ensure output directory exists
       const outputDir = path.dirname(path.resolve(params.outputPath));
       await fs.mkdir(outputDir, { recursive: true });
 
       // Pull screenshot to local path
-      await runAdbCommand(['pull', devicePath, params.outputPath], params.timeoutMs);
+      await runAdbCommand(['pull', DEVICE_SCREENSHOT_PATH, params.outputPath], params.timeoutMs);
 
       // Clean up device file
       try {
-        await runAdbCommand(['shell', 'rm', devicePath], params.timeoutMs);
+        await runAdbCommand(['shell', 'rm', DEVICE_SCREENSHOT_PATH], params.timeoutMs);
       } catch {
         // Ignore cleanup errors
       }
