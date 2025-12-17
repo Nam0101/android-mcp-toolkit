@@ -54,6 +54,8 @@ const installedPackagesInputSchema = z.object({
     .max(15000)
     .default(5000)
     .describe('Timeout per adb call in milliseconds')
+}).refine(data => !(data.systemOnly && data.thirdPartyOnly), {
+  message: 'Cannot set both systemOnly and thirdPartyOnly to true'
 });
 
 const screenshotInputSchema = z.object({
