@@ -259,6 +259,8 @@ function registerDeviceTool(server) {
         packages = packages.filter(pkg => pkg.toLowerCase().includes(filterLower));
       }
 
+      packages.sort();
+
       if (packages.length === 0) {
         return { content: [{ type: 'text', text: 'No packages found matching criteria.' }] };
       }
@@ -266,7 +268,7 @@ function registerDeviceTool(server) {
       const typeLabel = params.systemOnly ? 'system' : params.thirdPartyOnly ? 'third-party' : 'all';
       const header = `Installed packages (${typeLabel})${params.filter ? ` matching "${params.filter}"` : ''}: ${packages.length} found`;
 
-      return { content: [{ type: 'text', text: `${header}\n\n${packages.sort().join('\n')}` }] };
+      return { content: [{ type: 'text', text: `${header}\n\n${packages.join('\n')}` }] };
     }
   );
 
