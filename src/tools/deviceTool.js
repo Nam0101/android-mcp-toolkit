@@ -1,5 +1,7 @@
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
+const path = require('node:path');
+const fs = require('node:fs/promises');
 const z = require('zod/v4');
 
 const execFileAsync = promisify(execFile);
@@ -255,9 +257,6 @@ function registerDeviceTool(server) {
       inputSchema: screenshotInputSchema
     },
     async params => {
-      const path = require('node:path');
-      const fs = require('node:fs/promises');
-
       const devicePath = '/sdcard/mcp_screenshot.png';
 
       // Capture screenshot on device
