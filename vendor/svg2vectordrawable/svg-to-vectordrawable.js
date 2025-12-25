@@ -1,5 +1,4 @@
-const { parseSvg } = require('svgo/lib/parser');
-const JSAPI = require('svgo/lib/svgo/jsAPI');
+const { parseSvg, JSAPI } = require('./svgo-adapter');
 // https://www.npmjs.com/package/svg-path-bounds
 const pathBounds = require('svg-path-bounds');
 // https://github.com/fontello/svgpath

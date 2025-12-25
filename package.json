@@ -1,6 +1,6 @@
 {
   "name": "android-mcp-toolkit",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "MCP server with useful Android development tools: SVG conversion, Logcat management, and Device automation (dump UI, screenshot, input).",
   "main": "dist/index.js",
   "scripts": {

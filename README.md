@@ -46,32 +46,37 @@ While the AI ecosystem flourishes with web-first tools, Android development ofte
   - Performance: LRU cache (32 entries) keyed by SVG + options plus fast reuse in-session.
   - Converter: vendored fork in `vendor/svg2vectordrawable` with fixes for `rgb()/rgba()`, `hsl()/hsla()`, and named colors. Upstream license: `vendor/svg2vectordrawable/LICENSE` (MIT).
 
-- `read-adb-logcat`
-  - Inputs: `packageName` (resolve pid via `adb shell pidof -s`), `pid` (explicit), `tag`, `priority` (`V|D|I|W|E|F|S`, default `V`), `maxLines` (tail count, default `200`, max `2000`), `timeoutMs` (default `5000`, max `15000`).
-  - Behavior: Runs `adb logcat -d -t <maxLines>` with optional `--pid=<pid>` and `-s tag:priority`.
-  - Output: Returns the logcat text; if no lines are returned, responds with a short message.
-  - Notes: Requires `adb` available in PATH and a connected device/emulator. Provide at least one of `packageName`, `pid`, or `tag` to scope logs.
-
-- `get-pid-by-package`
-  - Inputs: `packageName` (required), `timeoutMs` (default `5000`, max `15000`).
-  - Behavior: Resolves pid via `adb shell pidof -s <package>`.
-  - Notes: Use this first, then pass pid to other logcat tools for noise-free filtering.
+- `manage-logcat`
+  - Inputs:
+    - `action`: `read` (default), `crash`, `anr`, or `clear`.
+    - `packageName`: Optional. Resolves PID via `adb shell pidof`.
+    - `pid`: Optional. Explicit PID.
+    - `tag`: Optional. Filter by tag (e.g. `MyApp`).
+    - `priority`: `V`, `D`, `I`, `W`, `E`, `F`, `S` (default `V`).
+    - `maxLines`: Tail count (default 200, max 2000).
+    - `timeoutMs`: Default 5000.
+  - Behavior:
+    - `read`: Fetches logcat tail.
+    - `crash`: Fetches `logcat -b crash`.
+    - `anr`: Fetches recent ActivityManager ANR logs + tail of `/data/anr/traces.txt`.
+    - `clear`: clears logcat buffers.
 
 - `get-current-activity`
   - Inputs: `timeoutMs` (default `5000`, max `15000`).
-  - Behavior: Parses `adb shell dumpsys window` for `mCurrentFocus` / `mFocusedApp` to reveal the currently focused window (useful even in single-activity setups to confirm top window).
+  - Behavior: Inspects `dumpsys window` to find the currently focused app/window. Useful to verify state.
 
-- `fetch-crash-stacktrace`
-  - Inputs: `packageName` (optional, resolves pid), `maxLines` (default `400`, max `2000`), `timeoutMs` (default `5000`, max `15000`).
-  - Behavior: Pulls crash buffer via `adb logcat -b crash -d -t <maxLines>`; filters by `--pid` when package is provided.
+- `dump-ui-hierarchy`
+  - Inputs: `timeoutMs` (default 10000).
+  - Behavior: Captures current UI hierarchy as XML via `uiautomator`.
 
-- `check-anr-state`
-  - Inputs: `maxLines` (default `400`, max `2000`), `timeoutMs` (default `5000`, max `15000`).
-  - Behavior: Fetches `ActivityManager:E *:S` (recent ANR logs) and best-effort reads `/data/anr/traces.txt` (stat + tail 200 lines). May require root/debuggable.
+- `take-screenshot`
+  - Inputs: `outputPath` (required), `timeoutMs`.
+  - Behavior: Saves device screenshot to local file.
 
-- `clear-logcat-buffer`
-  - Inputs: `timeoutMs` (default `5000`, max `15000`).
-  - Behavior: Runs `adb logcat -c` to clear buffers before a new scenario.
+- `inject-input`
+  - Inputs: `command` (`tap`, `text`, `swipe`, `keyevent`, `back`, `home`), `args` (array), `timeoutMs`.
+  - Optional: `elementId` or `elementText` (finds element center and taps it).
+  - Behavior: Simulates user interaction suitable for testing flows.
 
 - `estimate-text-length-difference`
   - Inputs: `sourceText` (original), `translatedText` (to compare), `tolerancePercent` (default `30`, max `500`).
@@ -80,11 +85,6 @@ While the AI ecosystem flourishes with web-first tools, Android development ofte
 ## Roadmap (planned)
 - Additional MCP tools for Android assets (e.g., batch conversions, validations, optimizers).
 - Optional resource prompts for common Android drawables/templates.
-- Upcoming MCP utilities (planned):
-  - Logcat reader: stream and filter Android logcat output via MCP.
-  - Asset checkers: flag common drawable issues (size, alpha, color profile).
-  - Batch conversions: multi-SVG to VectorDrawable with consistent options.
-  - Template prompts: quick-start drawable/XML snippets for common patterns.
 
 ## Quick start
 - `npm install`
@@ -99,9 +99,6 @@ Add to your Cursor settings JSON:
 ```json
 {
   "mcpServers": {
-    "figma-desktop": {
-      "url": "http://127.0.0.1:3845/mcp"
-    },
     "android-mcp-toolkit": {
       "command": "npx",
       "args": [

@@ -16,7 +16,7 @@ const serverInstructions = [
 const server = new McpServer(
   {
     name: 'android-mcp-toolkit',
-    version: '1.2.1'
+    version: '1.3.0'
   },
   {
     capabilities: { logging: {} },
