@@ -886,18 +886,11 @@ JS2XML.prototype.svgHexToAndroid = function(hexColor) {
 };
 
 JS2XML.prototype.simplifyAndroidHexCode = function(androidColorHex) {
-    // Remove alpha is FF
+    // Remove alpha if FF (convert #FFRRGGBB to #RRGGBB)
+    // Android VectorDrawable only supports 6-character (#RRGGBB) or 8-character (#AARRGGBB) hex codes
+    // 3-character (#RGB) or 4-character (#ARGB) codes are NOT supported
     if (/#FF[A-F0-9]{6}/.test(androidColorHex)) {
         androidColorHex = '#' + androidColorHex.substr(-6);
-    }
-    let partOdd = androidColorHex.substr(1).split('').filter((item, index) => {
-        return index % 2 === 0;
-    }).join('');
-    let partEven = androidColorHex.substr(1).split('').filter((item, index) => {
-        return index % 2 === 1;
-    }).join('');
-    if (partOdd === partEven) {
-        androidColorHex = '#' + partOdd;
     }
     return androidColorHex;
 };
