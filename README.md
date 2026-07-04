@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/nam0101-android-mcp-toolkit-badge.png)](https://mseep.ai/app/nam0101-android-mcp-toolkit)
+
 # Android MCP Toolkit for AI Agents
 
 Small MCP server with three tools:
